@@ -48,7 +48,6 @@ define([
                 formId = recaptcha ? recaptcha.element.attr('id') : '',
                 originalCtx = this;
 
-            debugger;
             if (recaptcha &&
                 recaptcha.options.size === 'invisible' &&
                 !recaptcha.getResponse()
