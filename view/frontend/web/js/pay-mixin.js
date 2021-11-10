@@ -1,11 +1,12 @@
 define([
     'jquery',
     'mage/url',
+    'mage/translate',
     'mage/utils/wrapper',
     'Magento_Ui/js/modal/alert',
     'Magento_Checkout/js/model/full-screen-loader',
     'Swissup_Recaptcha/js/model/recaptcha-assigner'
-], function ($, urlBuilder, wrapper, alert, loader, recaptchaAssigner) {
+], function ($, url, $t, wrapper, alert, loader, recaptchaAssigner) {
     'use strict';
 
     /**
@@ -18,7 +19,7 @@ define([
         var recaptcha = recaptchaAssigner.getRecaptcha(),
             formId = recaptcha ? recaptcha.element.attr('id') : '';
 
-        $.post(urlBuilder.build("convergeRecaptcha"), {
+        $.post(url.build("convergeRecaptcha"), {
             form_id: formId,
             token: recaptcha.getResponse()
         }).then(function (response) {
@@ -44,8 +45,8 @@ define([
             var args = Array.prototype.slice.call(arguments),
                 originalMethod = args.shift(args),
                 recaptcha = recaptchaAssigner.getRecaptcha(),
-                formId = recaptcha ? recaptcha.element.attr('id') : '';
-                context = this;
+                formId = recaptcha ? recaptcha.element.attr('id') : '',
+                originalCtx = this;
 
             debugger;
             if (recaptcha &&
@@ -55,13 +56,13 @@ define([
                 // It is invisible recaptcha. We have to postpone original action.
                 // And call it when recaptcha response received.
                 recaptcha.element.one('recaptchaexecuted', function () {
-                    validate(originalMethod.bind(context, args));
+                    validate(originalMethod.bind(originalCtx, ...args));
                 });
 
                 return;
             }
 
-            validate(originalMethod.bind(context, args));
+            validate(originalMethod.bind(originalCtx, ...args));
         });
 
         return component;
