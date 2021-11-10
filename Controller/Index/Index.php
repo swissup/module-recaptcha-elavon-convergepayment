@@ -29,42 +29,38 @@ class Index extends Action
         /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $formId = $this->getRequest()->getParam('form_id', '');
-        $token = $this->getRequest()->getParam('token', '');
+        if (!$formId) {
+            return $this->sendJson([
+                'status' => 'error',
+                'message' => __("Form ID is required.")
+            ]);
+        }
+
         $captcha = $formId ? $this->helper->getCaptcha($formId) : null;
-        $response = $captcha ? $captcha->verify($token) : null;
-        $isSuccess = $response && $response->isSuccess();
 
-        if ($isSuccess) {
-            if ($this->getRequest()->isAjax()) {
-                return $this->resultFactory
-                    ->create(ResultFactory::TYPE_JSON)
-                    ->setData([
-                        'status' => 'ok'
-                    ]);
-            } else {
-                $this->messageManager->addSuccessMessage(__("Recaptcha is valid"));
+        if ($captcha && $captcha->isRequired()) {
+            $token = $this->getRequest()->getParam('token', '');
+            $response = $captcha->verify($token);
+            $isSuccess = $response && $response->isSuccess();
 
-                return $resultRedirect->setPath('');
+            if (!$isSuccess) {
+                $errors = implode($response->getErrorCodes());
+
+                return $this->sendJson([
+                    'status' => 'error',
+                    'message' => __("Invalid recaptcha. [error-code: %1]", $errors)
+                ]);
             }
         }
 
-        $errors = implode(
-            $response ? $response->getErrorCodes() : ['missing-form-id'],
-            ', '
-        );
-        if ($this->getRequest()->isAjax()) {
-            return $this->resultFactory
-                    ->create(ResultFactory::TYPE_JSON)
-                    ->setData([
-                        'status' => 'error',
-                        'message' => __("Invalid recaptcha. [error-code: %1]", $errors)
-                    ]);
-        }
+        return $this->sendJson(['status' => 'ok']);
+    }
 
-        $this->messageManager->addErrorMessage(
-            __("Invalid recaptcha. [error-code: %1]", $errors)
-        );
-
-        return $resultRedirect->setPath('');
+    /**
+     * @param  array $data
+     * @return \Magento\Framework\Controller\Result
+     */
+    private function sendJson($data) {
+        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($data);
     }
 }
