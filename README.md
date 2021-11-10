@@ -1,6 +1,7 @@
 # ReCAPTCHA for Elavon_ConvergePayment
 
-Server side recaptcha verification and JS mixins for reCapctha and Elavon ConvergePayment at Checkout.
+This integration required when customer uses new credit card on checkout with Elavon ConvergePayment. 
+It adds server side recaptcha verification and JS mixins for reCapctha.
 
 ### Installation
 
