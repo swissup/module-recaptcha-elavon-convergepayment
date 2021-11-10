@@ -1,0 +1,24 @@
+{
+    "name": "swissup/module-recaptcha-elavon-convergepayment",
+    "description": "Server side recaptcha verification and JS mixins for reCapctha and Elavon ConvergePayment at Checkout.",
+    "keywords": [
+        "elavon",
+        "convergepayment",
+        "elavon converge payment",
+        "swissup",
+        "recaptcha",
+        "magento"
+    ],
+    "require": {
+        "swissup/module-recaptcha": "^1.3.18"
+    },
+    "type": "magento2-module",
+    "version": "0.0.1",
+    "license": "MIT",
+    "autoload": {
+        "files": [ "registration.php" ],
+        "psr-4": {
+            "Swissup\\RecaptchaElavonConvergePayment\\": ""
+        }
+    }
+}
